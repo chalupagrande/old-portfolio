@@ -1,7 +1,25 @@
+
+$portraitWidth: 10em;
 .portrait {
   position: relative;
   .me {
     position: absolute;
     mix-blend-mode: screen;
+    width: $portraitWidth;
+    border-radius: 50% 50%;
+    left:0;
+    transition: transform 0.3s;
+    transform-origin: 50% 100%;
+
   }
+
+  &:hover {
+    & .me:first-child{
+      transform: rotate(10deg);
+    }
+    & .me:last-child {
+      transform: rotate(-10deg);
+    }
+  }
+
 }

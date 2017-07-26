@@ -1,13 +1,16 @@
-import {createStore} from 'Redux'
+import {createStore} from 'redux'
 
 let initialState = {
-  value: 0
+  user_input: '',
 }
 
 function reducer(state = initialState, action){
   switch (action.type) {
-    case 'INCREMENT':
-      return state + 1
+    case 'USER_INPUT':
+      return {
+        user_input: action.input,
+        intervals: action.intervals
+      }
     case 'DECREMENT':
       return state - 1
     default:
