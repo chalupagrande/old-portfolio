@@ -15,11 +15,6 @@ class Splash extends React.Component {
   render(){
     return(
       <div className="wrapper">
-        {/* <div className="portrait">
-          <img className="me" src="assets/me-blue.png" alt=""/>
-          <img className="me" src="assets/me-red.png" alt=""/>
-          <img className="me" src="assets/me-green.png" alt=""/>
-        </div> */}
         <ul>
           {this.state.things.map((e, i)=> <Link to={`/g/${i}`} key={i}> <li>{e}</li> </Link>)}
         </ul>

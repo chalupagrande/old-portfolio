@@ -9,11 +9,12 @@ class UserInput extends React.Component {
     this.intervals = []
     this.overallTime = 0
 
-    this.onKeyPress = this.onKeyPress.bind(this)
+    this.onKeyDown = this.onKeyDown.bind(this)
     this.submit = this.submit.bind(this)
+    this.getStats = this.getStats.bind(this)
   }
   
-  onKeyPress(event){
+  onKeyDown(event){
     //start time if they have just begun or if over 60 seconds
     if(this.currentTypeInterval == 0 || this.overallTime == 0){
       this.currentTypeInterval = new Date()
@@ -21,7 +22,11 @@ class UserInput extends React.Component {
     } 
 
     let key = event.key
-    if(key != 'Shift' || key != 'CapsLock'){
+    if(key.match(/Arrow/)){
+      //TODO:
+      //HANDLE CURSOR DIRECTION
+    }
+    if(key !== 'Shift' || key !== 'CapsLock'){
       let keyObj = {
         key: key,
         beforeInterval: (new Date - this.currentTypeInterval),
@@ -29,26 +34,31 @@ class UserInput extends React.Component {
       }
       this.currentTypeInterval = new Date()
       this.intervals.push(keyObj)
-    } 
+    }
   }
 
   submit(event){
-    store.dispatch({
-      type: 'USER_INPUT',
-      intervals: this.intervals,
-      input: event.target.querySelector('textarea.text-input').value
-    })
+    event.preventDefault()
 
     this.currentTypeInterval = new Date()
-    this.overallTime = new Date()
-  }
+    this.overallTime = new Date() - this.overallTime
+    let data = {
+      overallTime: this.overallTime,
+      intervals: this.intervals,
+      input: event.target.querySelector('textarea.text-input').value
+    }
+    let stats = this.getStats(data)
 
+    store.dispatch(Object.assign({type: 'USER_INPUT'}, data))
+    this.overallTime = 0
+  }
+  
   render(){
     return(
       <div className="user-input">
         <p>Just type something in the text area.</p>
         <form onSubmit={this.submit}>
-          <textarea className='text-input' rows='4' cols='50' onKeyPress={this.onKeyPress}>
+          <textarea className='text-input' rows='4' cols='50' onKeyDown={this.onKeyDown}>
           </textarea>
           <button type="submit">Submit</button>
         </form>
@@ -56,62 +66,59 @@ class UserInput extends React.Component {
       </div>
     )
   }
+
+  /*
+    Helpers
+  ~~~~~~~~~~~~~~~~~ */
+  getStats(data){
+  
+    let wordsArray = data.input.slice(' ')
+    let charArray = data.input.slice('')
+    let seconds = data.overallTime / 1000 
+    let wpm = wordsArray.length * 60 / seconds
+
+    let list = {}
+    let prev = undefined
+
+    for(var i = 0; i < data.intervals.length; i++){
+      let int = data.intervals[i]
+      int.from = prev
+      let char = int.key.toLowerCase()
+      if(list[char]){
+        list[char].addInstance(int)        
+      } else {
+        list[char] = new Key(char, int)
+      }
+      prev = list[char]
+    }
+    console.log(list)
+    return {wpm, list}
+  }
+}
+
+
+
+
+
+const hands = {
+      left: ["a","s","d","f","g","q","w","e","r","t","z","x","c","v","b","1","2","3","4","5","`","!","@","#","$","%","~"],
+      right: ["y","u","i","o","p","0","9","8","7","6","h","j","k","l",";","'","ENTER","n","m",",",".","/","?",">","<",":","\"","{","}","|","+","_",")","(","*","&","^","[","]","\\","=","-"]
+    }
+class Key {
+  constructor(key, interval){
+    this.frequency = 1
+    this.key = key
+    this.hand = this.determineHand(key)
+    this.intervals = [interval]
+  }
+  determineHand(l){
+    if(l === ' ' || l === 'SHIFT') return 'EITHER'
+    return hands.left.indexOf(l) > -1 ? 'LEFT' : 'RIGHT'
+  }
+  addInstance(interval){
+    this.frequency += 1
+    this.intervals.push(interval)
+  }
 }
 
 export default UserInput
-
-
-
-/*
-REFERENCE
-~~~~~~~~~~~~~~~~~~~~~~~*/
-// let interval = 0,
-//     intervalID,
-//     animationID,
-//     result = '',
-//     intervals = [],
-//     reset = false,
-//     target = document.getElementById('result');
-
-// document.getElementById('input').addEventListener('input', function(e){
-//   if(intervalID) clearInterval(intervalID)
-//   if(reset){ 
-//     clearInterval(intervalID)
-//     result = ''
-//     interval = 0
-//     intervals = []
-//     reset = false
-//   }
-//   if(result.length > e.target.value){
-    
-//   }
-  
-//   result = e.target.value
-//   intervals.push(interval)
-//   interval = 0
-//   intervalID = setInterval(function(){ interval += 20}, 20)
-// })
-// document.getElementById('input').addEventListener('keyup', function(e){
-//   console.log(e)
-// })
-
-// document.getElementById('repeat').addEventListener('click', type)
-// document.getElementById('save').addEventListener('click',function(e){
-//   console.log(`var intervals = ${JSON.stringify(intervals)}
-// var result = ${JSON.stringify(result)}` )
-//   reset = true
-// })
-
-// function type(){
-//   target.innerText = ''
-//   var index = 0;
-//   function typeLetter(){
-//       setTimeout(function(){
-//         if(!result[index]) return
-//         target.innerText += result[index]
-//         index +=1
-//         animationID = requestAnimationFrame(typeLetter)
-//     }, intervals[index])
-//   }
-//   typeLetter()
-// }
