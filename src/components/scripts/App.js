@@ -1,18 +1,19 @@
 import React from 'react';
 import { HashRouter as Router, Route} from 'react-router-dom';
 import Splash from './splash'
-import SampleRoute from './sample-route';
+import Project from './project';
+import Edge from './edge';
 
 class App extends React.Component {
-  shouldComponentUpdate(){
 
-  }
   render() {
     return (
       <Router>
         <div className="router">
-          <Route path="/g/:gistId" component={SampleRoute} />
           <Route path='/' exact={true} component={Splash} />
+          <Route path="/g/:gistId" component={Project} />
+          <Route path='/edge' component={Edge} />
+
         </div>
       </Router>
     );

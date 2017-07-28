@@ -1,6 +1,6 @@
 import React from 'react';
 
-class SampleRoute extends React.Component {
+class Project extends React.Component {
   constructor(){
     super()
     this.state = {}
@@ -10,4 +10,4 @@ class SampleRoute extends React.Component {
   }
 }
 
-export default SampleRoute
+export default Project

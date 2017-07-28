@@ -36,7 +36,7 @@ class UserInput extends React.Component {
       this.keyList[char].addInstance()
       this.keyList[char].addBefore(this.prev)
       //create new interval
-      let int = new Interval(this.keyList[char], new Date - this.currentTypeInterval)
+      let int = new Interval(this.keyList[char], new Date() - this.currentTypeInterval)
       //add interval to prev's after
       if(this.prev) this.prev.key.addAfter(this.keyList[char])
       //set new interval to prev
