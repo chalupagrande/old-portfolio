@@ -28,7 +28,7 @@ class Edge extends React.Component {
     let cluster = d3.cluster()
       .size([360, this.opts.innerRadius])
     let line = d3.radialLine()
-      .curve(d3.curveBundle.beta(0.75))
+      .curve(d3.curveBundle.beta(0.50))
       .radius(function(d) { return d.y; })
       .angle(function(d) { return d.x / 180 * Math.PI; });
     
@@ -42,10 +42,11 @@ class Edge extends React.Component {
     cluster(root)
 
     let d = this.packageImports(root.leaves())
+    console.log(d)
     link = link
         .data(d)
         .enter().append('path')
-        .each(function(d) { d.source = d[0], d.target = d[d.length - 1]; })
+        .each(function(d, i) { d.source = d[0], d.target = d[d.length - 1]; if(i == 30)console.log(d)})
         .attrs({
           class: 'link',
           d: line,

@@ -1,16 +1,20 @@
 import {createStore} from 'redux'
 
 let initialState = {
-  user_input: '',
+  overallTime: 0,
+  wpm: 0,
+  intervals: [],  
+  input: '',
+  keys: {},
+  matrix: [],
+  keyByIndex: new Map(), // <= should be d3.map
+  indexByKey: new Map(), 
 }
 
 function reducer(state = initialState, action){
   switch (action.type) {
     case 'USER_INPUT':
-      return {
-        user_input: action.input,
-        intervals: action.intervals
-      }
+      return action.data
     case 'DECREMENT':
       return state - 1
     default:

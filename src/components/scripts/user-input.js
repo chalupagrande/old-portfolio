@@ -1,5 +1,6 @@
 import React from 'react'
 import store from '../../store'
+import * as d3 from 'd3'
 
 class UserInput extends React.Component {
   constructor(props){
@@ -13,6 +14,7 @@ class UserInput extends React.Component {
 
     this.onKeyDown = this.onKeyDown.bind(this)
     this.submit = this.submit.bind(this)
+    this.createMatrix = this.createMatrix.bind(this)
     // this.getStats = this.getStats.bind(this)
   } // /constructor
   
@@ -52,18 +54,57 @@ class UserInput extends React.Component {
     this.overallTime = new Date() - this.overallTime
     let input = event.target.querySelector('textarea.text-input').value
     event.target.querySelector('textarea.text-input').value = ''
+    let matrixAndMaps = this.createMatrix(this.keyList)
     let data = {
       overallTime: this.overallTime,
       wpm: input.split(' ').length * 60 / (this.overallTime /1000),
-      intervals: this.intervals,
+      intervals: this.intervals,  
       input: input,
-      keys: this.keyList
+      keys: this.keyList,
+      matrix: matrixAndMaps.matrix,
+      keyByIndex: matrixAndMaps.keyByIndex,
+      indexByKey: matrixAndMaps.indexByKey
     }
+    this.createMatrix(this.keyList)
     
-    store.dispatch(Object.assign({type: 'USER_INPUT'}, data))
+    store.dispatch({type: 'USER_INPUT', data: data})
     this.overallTime = 0
     this.currentTypeInterval = 0
   } // /submit
+  
+  createMatrix(keys){
+    var matrix = []
+    var keyByIndex = d3.map()
+    var indexByKey = d3.map()
+    var n = 0
+
+    //create map
+    for(let letter in keys){
+      if(!indexByKey.has(letter)){
+        keyByIndex.set(n, letter) 
+        indexByKey.set(letter, n)
+        n += 1
+      }
+    }
+
+    //create matrix
+    for(let curLetter in keys){
+      let keyObj = keys[curLetter]
+      let index = indexByKey.get(curLetter)
+      let row = matrix[index]
+      if(!row){
+        row = matrix[index] = []
+        for (var i = 0; i < n; i++) row[i] = 0;
+      } 
+      // only doing keys before right now
+      keyObj.keysBefore.forEach((intervalObj)=>{
+        if(!intervalObj) return
+        let targetIndex = indexByKey.get(intervalObj.key.key)
+        row[targetIndex] += 1
+      })
+    }
+    return {matrix, keyByIndex, indexByKey}
+  }
   
   render(){
     return(
