@@ -64,7 +64,8 @@ class Ribbons extends React.Component {
         .style("stroke", function(d) { return fill(d.index); })
         .attrs({
           d: arc,
-          class: 'arc'
+          class: 'arc',
+          stroke: 'white',
         });
 
     g.append("text")
